@@ -20,12 +20,20 @@ public class AIKartController : MonoBehaviour
     public float gravityMultiplier = 3f;
     public float groundCheckDistance = 0.5f;
     public LayerMask groundLayer;
+    
+    [Header("Dificultad")]
+    [Range(0f, 1f)]
+    public float difficultyLevel = 0.7f; // 0 = muy fácil, 1 = muy difícil
+    
 
     private Rigidbody rb;
     private int currentWaypointIndex = 0;
     private float currentSpeed;
     private bool isGrounded;
     private RaycastHit groundHit;
+    private float effectiveMaxSpeed;
+    private float effectiveTurnSpeed;
+    private float effectiveCornerBraking;
 
     void Awake()
     {
@@ -36,6 +44,7 @@ public class AIKartController : MonoBehaviour
     void FixedUpdate()
     {
         CheckGround();
+        ApplyDifficulty();
         NavigateToWaypoint();
         ApplyGravity();
         AlignToGround();
@@ -46,26 +55,30 @@ public class AIKartController : MonoBehaviour
     {
         if (waypointPath == null) return;
 
+        //Recogemos la posicion del WayPoint actual
         Debug.Log("WayPointActual --> " + currentWaypointIndex);
         Transform target = waypointPath.GetWaypoint(currentWaypointIndex);
 
-        // Dirección hacia el waypoint en espacio local
+        // Dirección hacia el waypoint en espacio local 
         Vector3 localTarget = transform.InverseTransformPoint(target.position);
 
         // Cuánto hay que girar: valor entre -1 y 1
         float steerInput = Mathf.Clamp(localTarget.x / localTarget.magnitude * steeringSensitivity, -1f, 1f);
 
-        // Aceleración: reduce velocidad si la curva es muy cerrada
-        float cornerFactor = 1f - Mathf.Abs(steerInput) * 0.4f;
-        float targetSpeed = maxSpeed * cornerFactor;
-        currentSpeed = Mathf.Lerp(currentSpeed, targetSpeed, acceleration * Time.fixedDeltaTime);
+        Debug.Log($"effectiveMaxSpeed: {effectiveMaxSpeed} | effectiveTurnSpeed: {effectiveTurnSpeed} | steerInput: {steerInput} | currentSpeed: {currentSpeed}");
 
+        
+        // Aceleración: reduce velocidad si la curva es muy cerrada
+        float cornerFactor = 1f - Mathf.Abs(steerInput) * effectiveCornerBraking;
+        float targetSpeed = effectiveMaxSpeed * cornerFactor;
+        currentSpeed = Mathf.Lerp(currentSpeed, targetSpeed, acceleration * Time.fixedDeltaTime);
+        
         // Movimiento
         Vector3 move = transform.forward * currentSpeed;
         rb.linearVelocity = new Vector3(move.x, rb.linearVelocity.y, move.z);
 
         // Giro
-        float turn = steerInput * turnSpeed * Time.fixedDeltaTime;
+        float turn = steerInput * effectiveTurnSpeed  * Time.fixedDeltaTime;
         rb.MoveRotation(rb.rotation * Quaternion.Euler(0f, turn, 0f));
 
         // Comprueba si ha llegado al waypoint
@@ -107,6 +120,20 @@ public class AIKartController : MonoBehaviour
     {
         enabled = !stunned;
         if (stunned) rb.linearVelocity = Vector3.zero;
+    }
+    
+    
+    // Aplica mayor dificultad a la IA, mayor velocidad, giro y menos frenada
+    void ApplyDifficulty()
+    {
+        // Velocidad: entre el 50% y el 100% del maxSpeed configurado
+        effectiveMaxSpeed = Mathf.Lerp(maxSpeed * 0.5f, maxSpeed, difficultyLevel);
+
+        // Steering: más dificultad = gira más preciso y rápido
+        effectiveTurnSpeed = Mathf.Lerp(turnSpeed * 0.6f, turnSpeed, difficultyLevel);
+
+        // Frenada en curva: más dificultad = frena menos (conduce más agresivo)
+        effectiveCornerBraking = Mathf.Lerp(0.6f, 0.2f, difficultyLevel);
     }
 
     public float CurrentSpeed => currentSpeed;
