@@ -1,0 +1,101 @@
+using UnityEngine;
+
+public class GameManager : MonoBehaviour
+{
+    public static GameManager Instance;
+
+    [Header("Carrera")]
+    public int totalLaps = 3;
+
+    // Jugador
+    private int playerLap = 0;
+    private int playerLastCheckpoint = -1;
+
+    // IA
+    private int aiLap = 0;
+    private int aiLastCheckpoint = -1;
+
+    // Estado
+    private int totalCheckpoints;
+    private bool raceStarted = false;
+    private bool raceFinished = false;
+
+    void Awake()
+    {
+        Instance = this;
+    }
+
+    void Start()
+    {
+        totalCheckpoints = CheckpointManager.Instance.TotalCheckpoints;
+    }
+
+    // ─── JUGADOR ───────────────────────────────────────────
+
+    public void OnPlayerCheckpoint(int index)
+    {
+        if (raceFinished) return;
+
+        if (index == playerLastCheckpoint + 1)
+        {
+            playerLastCheckpoint = index;
+        }
+        else if (index == 0 && playerLastCheckpoint == totalCheckpoints - 1)
+        {
+            playerLastCheckpoint = 0;
+            playerLap++;
+            Debug.Log($"Jugador — Vuelta {playerLap}/{totalLaps}");
+
+            if (playerLap >= totalLaps)
+                FinishRace(true);
+
+        }
+    }
+
+    // ─── IA ────────────────────────────────────────────────
+
+    public void OnAICheckpoint(int index)
+    {
+        if (raceFinished) return;
+
+        if (index == aiLastCheckpoint + 1)
+        {
+            aiLastCheckpoint = index;
+        }
+        else if (index == 0 && aiLastCheckpoint == totalCheckpoints - 1)
+        {
+            aiLastCheckpoint = 0;
+            aiLap++;
+            Debug.Log($"IA — Vuelta {aiLap}/{totalLaps}");
+
+            if (aiLap >= totalLaps)
+                FinishRace(false);
+
+        }
+    }
+
+    // ─── FIN DE CARRERA ────────────────────────────────────
+
+    void FinishRace(bool playerWon)
+    {
+        raceFinished = true;
+        Debug.Log(playerWon ? "¡El jugador ha ganado!" : "¡La IA ha ganado!");
+    }
+
+    // ─── PROPIEDADES PÚBLICAS (para el HUD) ────────────────
+
+    public int PlayerLap => playerLap;
+    public int AILap => aiLap;
+    public bool RaceFinished => raceFinished;
+    public bool RaceStarted => raceStarted;
+
+    // Devuelve 1 si el jugador va primero, 2 si va segundo
+    public int PlayerPosition()
+    {
+        if (playerLap > aiLap) return 1;
+        if (playerLap < aiLap) return 2;
+        return playerLastCheckpoint >= aiLastCheckpoint ? 1 : 2;
+    }
+    
+    public int TotalLaps => totalLaps;
+}

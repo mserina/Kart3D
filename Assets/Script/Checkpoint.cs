@@ -6,11 +6,11 @@ public class Checkpoint : MonoBehaviour
 
     void OnTriggerEnter(Collider other)
     {
-        // if (other.CompareTag("Player"))
-        //     other.GetComponent<LapManager>()?.OnCheckpointReached(index);
-        //
-        // if (other.CompareTag("AI"))
-        //     other.GetComponent<AILapManager>()?.OnCheckpointReached(index);
+        if (other.CompareTag("Player"))
+            GameManager.Instance?.OnPlayerCheckpoint(index);
+
+        if (other.CompareTag("AI"))
+            GameManager.Instance?.OnAICheckpoint(index);
         
         Debug.Log($"Checkpoint {index} alcanzado por {other.gameObject.name}");
 

@@ -56,7 +56,7 @@ public class AIKartController : MonoBehaviour
         if (waypointPath == null) return;
 
         //Recogemos la posicion del WayPoint actual
-        Debug.Log("WayPointActual --> " + currentWaypointIndex);
+       // Debug.Log("WayPointActual --> " + currentWaypointIndex);
         Transform target = waypointPath.GetWaypoint(currentWaypointIndex);
 
         // Dirección hacia el waypoint en espacio local 
@@ -65,7 +65,7 @@ public class AIKartController : MonoBehaviour
         // Cuánto hay que girar: valor entre -1 y 1
         float steerInput = Mathf.Clamp(localTarget.x / localTarget.magnitude * steeringSensitivity, -1f, 1f);
 
-        Debug.Log($"effectiveMaxSpeed: {effectiveMaxSpeed} | effectiveTurnSpeed: {effectiveTurnSpeed} | steerInput: {steerInput} | currentSpeed: {currentSpeed}");
+        //Debug.Log($"effectiveMaxSpeed: {effectiveMaxSpeed} | effectiveTurnSpeed: {effectiveTurnSpeed} | steerInput: {steerInput} | currentSpeed: {currentSpeed}");
 
         
         // Aceleración: reduce velocidad si la curva es muy cerrada
