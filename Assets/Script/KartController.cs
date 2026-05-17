@@ -48,34 +48,28 @@ public class KartController : MonoBehaviour
     // To control move to the car (to accelerate or to brake)
     void HandleMovement()
     {
-        
-        float driveinput = Input.GetAxis("Vertical"); // W/S or arrows
-        bool isBraking = Input.GetKey(KeyCode.Space);   // Space — brake
-        
+        float driveinput = Input.GetAxis("Vertical");
+        bool isBraking = Input.GetKey(KeyCode.Space);
+
         if (isBraking)
         {
             currentSpeed = Mathf.MoveTowards(currentSpeed, 0f, brakeForce * Time.fixedDeltaTime);
         }
-        
-        if (driveinput > 0)
+        else if (driveinput > 0)
         {
-            currentSpeed = Mathf.MoveTowards(currentSpeed, maxSpeed * driveinput, acceleration * Time.fixedDeltaTime);
+            currentSpeed = Mathf.MoveTowards(currentSpeed, maxSpeed * driveinput * speedMultiplier, acceleration * Time.fixedDeltaTime);
         }
-            
         else if (driveinput < 0)
         {
             currentSpeed = Mathf.MoveTowards(currentSpeed, maxSpeed * 0.5f * driveinput, brakeForce * Time.fixedDeltaTime);
         }
-
         else
         {
             currentSpeed = Mathf.MoveTowards(currentSpeed, 0f, brakeForce * 0.5f * Time.fixedDeltaTime);
         }
-            
 
         Vector3 move = transform.forward * currentSpeed;
         rb.linearVelocity = new Vector3(move.x, rb.linearVelocity.y, move.z);
-        
     }
 
     
@@ -117,8 +111,12 @@ public class KartController : MonoBehaviour
     IEnumerator SpeedBoostCoroutine(float multiplier, float duration)
     {
         speedMultiplier = multiplier;
+        // Aplica la velocidad boost inmediatamente sin esperar la aceleración
+        currentSpeed = Mathf.Min(currentSpeed * multiplier, maxSpeed * multiplier);
         yield return new WaitForSeconds(duration);
         speedMultiplier = 1f;
+        // Vuelve a la velocidad normal al terminar
+        currentSpeed = Mathf.Min(currentSpeed, maxSpeed);
     }
     
     

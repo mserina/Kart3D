@@ -1,8 +1,16 @@
+using System.Collections;
 using UnityEngine;
 
 [RequireComponent(typeof(Rigidbody))]
 public class AIKartController : MonoBehaviour
 {
+    [Header("Wheels")]
+    public Transform wheelFL;
+    public Transform wheelFR;
+    public Transform wheelRL;
+    public Transform wheelRR;
+    public float wheelRadius = 0.3f;
+    
     [Header("Waypoints")]
     public WaypointPath waypointPath;
     public float waypointReachDistance = 3f;
@@ -115,12 +123,26 @@ public class AIKartController : MonoBehaviour
         }
     }
 
-    // Para que el sistema de stun del plátano pueda pararlo
+    
+    // Estos 3 metodos son para aplicar el stun de la banana a la IA
     public void SetStunned(bool stunned)
     {
         enabled = !stunned;
         if (stunned) rb.linearVelocity = Vector3.zero;
     }
+    
+    public void ApplyStun(float duration)
+    {
+        StartCoroutine(StunCoroutine(duration));
+    }
+    
+    IEnumerator StunCoroutine(float duration)
+    {
+        SetStunned(true);
+        yield return new WaitForSeconds(duration);
+        SetStunned(false);
+    }
+    
     
     
     // Aplica mayor dificultad a la IA, mayor velocidad, giro y menos frenada
@@ -134,6 +156,23 @@ public class AIKartController : MonoBehaviour
 
         // Frenada en curva: más dificultad = frena menos (conduce más agresivo)
         effectiveCornerBraking = Mathf.Lerp(0.6f, 0.2f, difficultyLevel);
+    }
+    
+    
+    // To move the wheels of the car 
+    void RotateWheels()
+    {
+        //This line calculate how many gradious must spin the wheel
+        float rpm = (currentSpeed / (2f * Mathf.PI * wheelRadius)) * 360f * Time.deltaTime;
+
+        // The move to the back wheels
+        wheelRL.Rotate(rpm, 0f, 0f);
+        wheelRR.Rotate(rpm, 0f, 0f);
+
+        // The move to the front wheels
+        float steer = Input.GetAxis("Horizontal") * 25f;
+        wheelFL.localRotation = Quaternion.Euler(wheelFL.localRotation.eulerAngles.x + rpm, steer, 0f);
+        wheelFR.localRotation = Quaternion.Euler(wheelFR.localRotation.eulerAngles.x + rpm, steer, 0f);
     }
 
     public float CurrentSpeed => currentSpeed;

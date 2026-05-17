@@ -32,10 +32,10 @@ public class PlayerPowerUpController : MonoBehaviour
         switch (currentPowerUp)
         {
             case PowerUpType.Banana:
-                //PowerUpEffects.Instance?.UseBanana(transform);
+                PowerUpEffects.Instance?.UseBanana(transform);
                 break;
             case PowerUpType.Turbo:
-               // PowerUpEffects.Instance?.UseTurbo(GetComponent<KartController>());
+               PowerUpEffects.Instance?.UseTurbo(GetComponent<KartController>());
                 break;
         }
 
