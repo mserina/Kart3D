@@ -16,6 +16,12 @@ public class GameManager : MonoBehaviour
     [Header("Pausa")]
     public GameObject pausePanel; 
     
+    [Header("Audio")]
+    public AudioSource audioSource;
+    public AudioClip contadorPrevio;
+    public AudioClip ya;
+
+    
     
     // Jugador
     private int playerLap = 0;
@@ -56,16 +62,23 @@ public class GameManager : MonoBehaviour
 
         HUDManager.Instance?.ShowCountdown("3");
         yield return new WaitForSeconds(1f);
+        if (audioSource != null && contadorPrevio != null)
+            audioSource.PlayOneShot(contadorPrevio);
 
         HUDManager.Instance?.ShowCountdown("2");
         yield return new WaitForSeconds(1f);
+        if (audioSource != null && contadorPrevio != null)
+            audioSource.PlayOneShot(contadorPrevio);
 
         HUDManager.Instance?.ShowCountdown("1");
         yield return new WaitForSeconds(1f);
-
+        if (audioSource != null && ya != null)
+            audioSource.PlayOneShot(ya);
+        
         HUDManager.Instance?.ShowCountdown("¡Ya!");
         yield return new WaitForSeconds(0.5f);
-
+        
+        
         HUDManager.Instance?.HideCountdown();
 
         // Desbloquea jugador e IA
@@ -136,6 +149,15 @@ public class GameManager : MonoBehaviour
 
         Time.timeScale = isPaused ? 1f : 0f;
         pausePanel.SetActive(!isPaused);
+
+        if (isPaused)
+        {
+            audioSource?.Play();
+        }
+        else
+        {
+            audioSource?.Pause();
+        }
     }
     
     

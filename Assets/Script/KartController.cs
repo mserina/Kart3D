@@ -20,6 +20,11 @@ public class KartController : MonoBehaviour
     public Transform wheelRL;
     public Transform wheelRR;
     public float wheelRadius = 0.3f;
+    
+    [Header("Audio")]
+    public AudioSource audioSource;  
+    public AudioClip turboClip;
+
 
     
     public AnimationCurve accelerationCurve = AnimationCurve.Linear(0, 1, 1, 0);
@@ -108,6 +113,7 @@ public class KartController : MonoBehaviour
     public void ApplySpeedBoost(float multiplier, float duration)
     {
         StartCoroutine(SpeedBoostCoroutine(multiplier, duration));
+        
     }
     
     IEnumerator SpeedBoostCoroutine(float multiplier, float duration)
@@ -115,7 +121,13 @@ public class KartController : MonoBehaviour
         speedMultiplier = multiplier;
         // Aplica la velocidad boost inmediatamente sin esperar la aceleración
         currentSpeed = Mathf.Min(currentSpeed * multiplier, maxSpeed * multiplier);
+        
+        if (audioSource != null && turboClip != null)
+            audioSource.PlayOneShot(turboClip);
+
         yield return new WaitForSeconds(duration);
+
+        
         speedMultiplier = 1f;
         // Vuelve a la velocidad normal al terminar
         currentSpeed = Mathf.Min(currentSpeed, maxSpeed);
