@@ -1,5 +1,6 @@
 using System.Collections;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class GameManager : MonoBehaviour
 {
@@ -11,6 +12,10 @@ public class GameManager : MonoBehaviour
     [Header("Referencias")]
     public KartController playerKart;
     public AIKartController aiKart;
+    
+    [Header("Pausa")]
+    public GameObject pausePanel; 
+    
     
     // Jugador
     private int playerLap = 0;
@@ -28,6 +33,12 @@ public class GameManager : MonoBehaviour
     void Awake()
     {
         Instance = this;
+    }
+    
+    void Update()
+    {
+        if (Input.GetKeyDown(KeyCode.Escape) && raceStarted && !raceFinished)
+            TogglePause();
     }
 
     void Start()
@@ -86,6 +97,14 @@ public class GameManager : MonoBehaviour
 
         }
     }
+    
+    // Devuelve 1 si el jugador va primero, 2 si va segundo
+    public int PlayerPosition()
+    {
+        if (playerLap > aiLap) return 1;
+        if (playerLap < aiLap) return 2;
+        return playerLastCheckpoint >= aiLastCheckpoint ? 1 : 2;
+    }
 
     // ─── IA ────────────────────────────────────────────────
 
@@ -109,6 +128,15 @@ public class GameManager : MonoBehaviour
         }
     }
 
+    // ─── PAUSA ────────────────────────────────────────────────
+
+    void TogglePause()
+    {
+        bool isPaused = Time.timeScale == 0f;
+
+        Time.timeScale = isPaused ? 1f : 0f;
+        pausePanel.SetActive(!isPaused);
+    }
     
     
     
@@ -117,11 +145,18 @@ public class GameManager : MonoBehaviour
     void FinishRace(bool playerWon)
     {
         raceFinished = true;
-        Debug.Log(playerWon ? "¡El jugador ha ganado!" : "¡La IA ha ganado!");
+        playerKart.enabled = false;
+        aiKart.enabled = false;
+
+        StartCoroutine(LoadResultScene(playerWon));
     }
 
-    
-    
+    IEnumerator LoadResultScene(bool playerWon)
+    {
+        yield return new WaitForSeconds(2f); // pausa dramática antes de cambiar
+        SceneManager.LoadScene(playerWon ? "Victoria" : "GameOver");
+    }
+
     
     
     
@@ -132,13 +167,7 @@ public class GameManager : MonoBehaviour
     public bool RaceFinished => raceFinished;
     public bool RaceStarted => raceStarted;
 
-    // Devuelve 1 si el jugador va primero, 2 si va segundo
-    public int PlayerPosition()
-    {
-        if (playerLap > aiLap) return 1;
-        if (playerLap < aiLap) return 2;
-        return playerLastCheckpoint >= aiLastCheckpoint ? 1 : 2;
-    }
+    
     
     public int TotalLaps => totalLaps;
 }

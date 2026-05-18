@@ -103,6 +103,8 @@ public class KartController : MonoBehaviour
         wheelFR.localRotation = Quaternion.Euler(wheelFR.localRotation.eulerAngles.x + rpm, steer, 0f);
     }
     
+    
+    
     public void ApplySpeedBoost(float multiplier, float duration)
     {
         StartCoroutine(SpeedBoostCoroutine(multiplier, duration));

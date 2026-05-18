@@ -8,6 +8,21 @@ EditorBuildSettings:
   - enabled: 0
     path: Assets/Scenes/SampleScene.unity
     guid: 99c9720ab356a0642a771bea13969a05
+  - enabled: 1
+    path: Assets/Scenes/Circuito.unity
+    guid: cb17ea8e11b99044288d5f5e8fceb286
+  - enabled: 1
+    path: Assets/Scenes/GameOver.unity
+    guid: 13a2191fc2ccc194f86312a3345b7638
+  - enabled: 1
+    path: Assets/Scenes/Menu.unity
+    guid: 048d12d0dec72d043aacb60712ad7c57
+  - enabled: 1
+    path: Assets/Scenes/Pausa.unity
+    guid: 0e96f90d3836a914ba25c5051213470d
+  - enabled: 1
+    path: Assets/Scenes/Victoria.unity
+    guid: fd5bc5d26512cf44fbe6e60b73b39e98
   m_configObjects:
     com.unity.input.settings.actions: {fileID: -944628639613478452, guid: 052faaac586de48259a63d0c4782560b, type: 3}
   m_UseUCBPForAssetBundles: 0
