@@ -20,7 +20,7 @@ public class PlayerPowerUpController : MonoBehaviour
         hasPowerUp = true;
         Debug.Log($"Power-up recogido: {type}");
 
-        //HUDManager.Instance?.UpdatePowerUpIcon(type);
+        HUDManager.Instance?.UpdatePowerUpIcon(type);
     }
 
     void UsePowerUp()
@@ -41,7 +41,7 @@ public class PlayerPowerUpController : MonoBehaviour
 
         currentPowerUp = null;
         hasPowerUp = false;
-        //HUDManager.Instance?.ClearPowerUpIcon();
+        HUDManager.Instance?.ClearPowerUpIcon();
     }
 
     public bool HasPowerUp => hasPowerUp;
