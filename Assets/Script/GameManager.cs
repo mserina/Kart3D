@@ -1,3 +1,4 @@
+using System.Collections;
 using UnityEngine;
 
 public class GameManager : MonoBehaviour
@@ -7,6 +8,10 @@ public class GameManager : MonoBehaviour
     [Header("Carrera")]
     public int totalLaps = 3;
 
+    [Header("Referencias")]
+    public KartController playerKart;
+    public AIKartController aiKart;
+    
     // Jugador
     private int playerLap = 0;
     private int playerLastCheckpoint = -1;
@@ -28,8 +33,38 @@ public class GameManager : MonoBehaviour
     void Start()
     {
         totalCheckpoints = CheckpointManager.Instance.TotalCheckpoints;
+        StartCoroutine(StartCountdown());
     }
 
+    
+    IEnumerator StartCountdown()
+    {
+        // Bloquea jugador e IA al inicio
+        playerKart.enabled = false;
+        aiKart.enabled = false;
+
+        HUDManager.Instance?.ShowCountdown("3");
+        yield return new WaitForSeconds(1f);
+
+        HUDManager.Instance?.ShowCountdown("2");
+        yield return new WaitForSeconds(1f);
+
+        HUDManager.Instance?.ShowCountdown("1");
+        yield return new WaitForSeconds(1f);
+
+        HUDManager.Instance?.ShowCountdown("¡Ya!");
+        yield return new WaitForSeconds(0.5f);
+
+        HUDManager.Instance?.HideCountdown();
+
+        // Desbloquea jugador e IA
+        playerKart.enabled = true;
+        aiKart.enabled = true;
+        raceStarted = true;
+    }
+    
+    
+    
     // ─── JUGADOR ───────────────────────────────────────────
 
     public void OnPlayerCheckpoint(int index)
@@ -74,6 +109,9 @@ public class GameManager : MonoBehaviour
         }
     }
 
+    
+    
+    
     // ─── FIN DE CARRERA ────────────────────────────────────
 
     void FinishRace(bool playerWon)
@@ -82,6 +120,11 @@ public class GameManager : MonoBehaviour
         Debug.Log(playerWon ? "¡El jugador ha ganado!" : "¡La IA ha ganado!");
     }
 
+    
+    
+    
+    
+    
     // ─── PROPIEDADES PÚBLICAS (para el HUD) ────────────────
 
     public int PlayerLap => playerLap;

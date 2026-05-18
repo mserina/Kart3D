@@ -22,6 +22,9 @@ public class HUDManager : MonoBehaviour
     public Sprite bananaSPrite;
     public Sprite turboSprite;
     
+    [Header("Cuenta atrás")]
+    public TextMeshProUGUI countdownText;
+    
     
 
     void Awake()
@@ -83,12 +86,25 @@ public class HUDManager : MonoBehaviour
                 break;
         }
     }
+    
 
     // Llamado desde PlayerPowerUpController al usar el power-up
     public void ClearPowerUpIcon()
     {
         powerUpIcon.gameObject.SetActive(false);
         powerUpEmpty.SetActive(true);
+    }
+    
+    
+    public void ShowCountdown(string text)
+    {
+        countdownText.gameObject.SetActive(true);
+        countdownText.text = text;
+    }
+
+    public void HideCountdown()
+    {
+        countdownText.gameObject.SetActive(false);
     }
     
 }
